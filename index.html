@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Favicon Generator</title>
+<meta name="description" content="Make a favicon from text, an emoji, or an uploaded image, right in your browser. Exports PNG sizes and a multi-resolution .ico file. Nothing is uploaded.">
+<link rel="canonical" href="https://0xelitesystem.github.io/favicon-generator/">
+<link rel="icon" href="data:,">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Favicon Generator">
+<meta property="og:description" content="Make a favicon from text, an emoji, or an uploaded image, right in your browser. Exports PNG sizes and a multi-resolution .ico file. Nothing is uploaded.">
+<meta property="og:url" content="https://0xelitesystem.github.io/favicon-generator/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Favicon Generator","applicationCategory":"DeveloperApplication","operatingSystem":"Any (browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://0xelitesystem.github.io/favicon-generator/","author":{"@type":"Person","name":"0xelitesystem","url":"https://elitesystem.ai"}}
+</script>
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#f5f6f8;
+    --panel:#ffffff;
+    --panel-2:#f0f2f5;
+    --text:#181b20;
+    --muted:#5b636f;
+    --border:#e1e4ea;
+    --accent:#4f46e5;
+    --accent-text:#ffffff;
+    --input-bg:#ffffff;
+    --danger:#c22626;
+    --ok:#1f8b4c;
+    --radius:12px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1015;
+      --panel:#161a20;
+      --panel-2:#1d222a;
+      --text:#e7eaef;
+      --muted:#98a2b1;
+      --border:#272d37;
+      --accent:#7c6cff;
+      --accent-text:#ffffff;
+      --input-bg:#0f1319;
+      --danger:#ff6f6f;
+      --ok:#57c98a;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:24px 16px 64px;
+  }
+  .wrap{max-width:1000px;margin:0 auto}
+  header h1{font-size:1.7rem;margin:0 0 4px}
+  header p{color:var(--muted);margin:0 0 24px;max-width:60ch}
+  .grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:840px){.grid{grid-template-columns:minmax(0,1fr) 360px}}
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+  }
+  .panel h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 16px}
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  label{display:block;font-weight:600;margin-bottom:6px;font-size:.9rem}
+  .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+  input[type=text],select{
+    width:100%;
+    padding:9px 10px;
+    background:var(--input-bg);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:8px;
+    font:inherit;
+  }
+  input[type=text]:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  input[type=file]{width:100%;font:inherit;color:var(--muted)}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  input[type=color]{
+    width:100%;height:38px;padding:2px;background:var(--input-bg);
+    border:1px solid var(--border);border-radius:8px;cursor:pointer;
+  }
+  .row{display:flex;gap:12px}
+  .row>*{flex:1;min-width:0}
+  .seg{display:flex;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:3px;gap:3px}
+  .seg button{
+    flex:1;border:0;background:transparent;color:var(--muted);
+    padding:8px;border-radius:6px;font:inherit;font-weight:600;cursor:pointer;
+  }
+  .seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-text)}
+  .check{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;cursor:pointer}
+  .check input{width:16px;height:16px;accent-color:var(--accent);margin:0}
+  .hidden{display:none}
+  fieldset{border:0;padding:0;margin:0}
+
+  /* preview */
+  .preview-lg-wrap{display:flex;justify-content:center;margin-bottom:18px}
+  .checker{
+    --c1:#ffffff;--c2:#d9dce2;
+    background-color:var(--c1);
+    background-image:
+      linear-gradient(45deg,var(--c2) 25%,transparent 25%),
+      linear-gradient(-45deg,var(--c2) 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,var(--c2) 75%),
+      linear-gradient(-45deg,transparent 75%,var(--c2) 75%);
+    background-size:16px 16px;
+    background-position:0 0,0 8px,8px -8px,-8px 0;
+  }
+  @media (prefers-color-scheme: dark){.checker{--c1:#20252d;--c2:#2c333d}}
+  #previewLarge{
+    width:160px;height:160px;border-radius:14px;border:1px solid var(--border);
+    display:block;image-rendering:auto;
+  }
+  .thumbs{display:flex;align-items:flex-end;justify-content:center;gap:22px;margin-bottom:18px}
+  .thumb{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .thumb canvas{border:1px solid var(--border);border-radius:4px}
+  .thumb span{font-size:.72rem;color:var(--muted)}
+  .downloads{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+  button.dl{
+    border:1px solid var(--border);background:var(--panel-2);color:var(--text);
+    padding:9px 10px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer;text-align:center;
+  }
+  button.dl:hover{border-color:var(--accent)}
+  button.dl.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+  button.dl:disabled{opacity:.45;cursor:not-allowed}
+  button.dl.wide{grid-column:1 / -1}
+  .snippet{margin-top:4px}
+  .snippet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .snippet-head button{
+    border:1px solid var(--border);background:var(--panel-2);color:var(--text);
+    padding:4px 10px;border-radius:6px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;
+  }
+  pre{
+    margin:0;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;
+    padding:12px;overflow:auto;font:12px/1.5 ui-monospace,"SFMono-Regular",Consolas,"Courier New",monospace;
+  }
+  #status{margin:14px 0 0;min-height:1.2em;font-size:.85rem;font-weight:600}
+  #status.err{color:var(--danger)}
+  #status.ok{color:var(--ok)}
+  footer{margin-top:36px;color:var(--muted);font-size:.82rem;text-align:center}
+  footer a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Favicon Generator</h1>
+    <p>Make a favicon from a letter, an emoji, or an image. Preview it at real pixel sizes, then export the PNG files and a multi-resolution <code>.ico</code>. Everything runs in your browser, nothing is uploaded.</p>
+  </header>
+
+  <div class="grid">
+    <!-- controls -->
+    <section class="panel" aria-label="Favicon options">
+      <h2>Source</h2>
+
+      <div class="field">
+        <div class="seg" role="group" aria-label="Favicon source">
+          <button type="button" id="modeText" aria-pressed="true">Text / Emoji</button>
+          <button type="button" id="modeImage" aria-pressed="false">Image</button>
+        </div>
+      </div>
+
+      <fieldset id="textControls">
+        <div class="field">
+          <label for="text">Text or emoji</label>
+          <input type="text" id="text" value="A" maxlength="12" autocomplete="off" spellcheck="false" placeholder="A, 42, or an emoji">
+          <p class="hint">Short works best. One or two characters, or a single emoji.</p>
+        </div>
+        <div class="field row">
+          <div>
+            <label for="font">Font</label>
+            <select id="font">
+              <option value="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Sans</option>
+              <option value="Georgia,'Times New Roman',Times,serif">Serif</option>
+              <option value="ui-monospace,'SFMono-Regular',Consolas,'Courier New',monospace">Mono</option>
+              <option value="Impact,'Haettenschweiler','Arial Narrow Bold',sans-serif">Display</option>
+              <option value="'Segoe Script','Brush Script MT',cursive">Script</option>
+            </select>
+          </div>
+          <div>
+            <label for="weight">Weight</label>
+            <select id="weight">
+              <option value="400">Regular</option>
+              <option value="600">Semibold</option>
+              <option value="700" selected>Bold</option>
+              <option value="800">Extra</option>
+              <option value="900">Black</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="textColor">Text color</label>
+          <input type="color" id="textColor" value="#ffffff">
+        </div>
+      </fieldset>
+
+      <fieldset id="imageControls" class="hidden">
+        <div class="field">
+          <label for="file">Image file</label>
+          <input type="file" id="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,image/bmp">
+          <p class="hint">PNG, JPEG, WebP, GIF, SVG, or BMP. A square image gives the cleanest result.</p>
+        </div>
+        <div class="field">
+          <label for="fit">Fit</label>
+          <select id="fit">
+            <option value="cover">Cover (fill, crop edges)</option>
+            <option value="contain">Contain (fit, keep whole image)</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <h2 style="margin-top:24px">Style</h2>
+      <div class="field row">
+        <div>
+          <label for="bgColor">Background</label>
+          <input type="color" id="bgColor" value="#4f46e5">
+        </div>
+        <div>
+          <label for="shape">Shape</label>
+          <select id="shape">
+            <option value="rounded">Rounded</option>
+            <option value="square">Square</option>
+            <option value="circle">Circle</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="check"><input type="checkbox" id="transparent"> Transparent background</label>
+      </div>
+      <div class="field">
+        <label for="padding">Padding <span id="padVal" class="hint" style="font-weight:400"></span></label>
+        <input type="range" id="padding" min="0" max="35" value="12">
+      </div>
+    </section>
+
+    <!-- preview + export -->
+    <section class="panel" aria-label="Preview and export">
+      <h2>Preview</h2>
+      <div class="preview-lg-wrap">
+        <canvas id="previewLarge" class="checker" width="256" height="256" role="img" aria-label="Large favicon preview"></canvas>
+      </div>
+      <div class="thumbs">
+        <div class="thumb"><canvas class="checker" width="48" height="48" data-size="48"></canvas><span>48</span></div>
+        <div class="thumb"><canvas class="checker" width="32" height="32" data-size="32"></canvas><span>32</span></div>
+        <div class="thumb"><canvas class="checker" width="16" height="16" data-size="16"></canvas><span>16</span></div>
+      </div>
+
+      <h2>Download</h2>
+      <div class="downloads">
+        <button class="dl primary wide" data-ico>favicon.ico (16 + 32 + 48)</button>
+        <button class="dl" data-png="16">PNG 16</button>
+        <button class="dl" data-png="32">PNG 32</button>
+        <button class="dl" data-png="48">PNG 48</button>
+        <button class="dl" data-png="180" data-name="apple-touch-icon.png">Apple 180</button>
+        <button class="dl" data-png="192">PNG 192</button>
+        <button class="dl" data-png="512">PNG 512</button>
+      </div>
+
+      <div class="snippet">
+        <div class="snippet-head">
+          <h2 style="margin:0">HTML for your &lt;head&gt;</h2>
+          <button type="button" id="copyBtn">Copy</button>
+        </div>
+        <pre><code id="snippet"></code></pre>
+      </div>
+
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+
+  <footer>
+    <p>Runs entirely in your browser. No uploads, no tracking. <a href="https://github.com/0xelitesystem/favicon-generator">Source</a></p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- state ---------- */
+var state = {
+  mode: "text",                 // "text" | "image"
+  text: "A",
+  font: "system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",
+  weight: "700",
+  textColor: "#ffffff",
+  bgColor: "#4f46e5",
+  transparent: false,
+  shape: "rounded",             // "rounded" | "square" | "circle"
+  padding: 0.12,                // fraction of the icon size
+  image: null,                  // HTMLImageElement once loaded
+  fit: "cover"                  // "cover" | "contain"
+};
+
+var SNIPPET =
+  '<link rel="icon" href="/favicon.ico" sizes="any">\n' +
+  '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n' +
+  '<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n' +
+  '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">';
+
+var $ = function(id){ return document.getElementById(id); };
+var thumbCanvases = Array.prototype.slice.call(document.querySelectorAll(".thumb canvas"));
+
+/* ---------- rendering ---------- */
+
+// Trace the icon outline for the chosen shape so background and content are clipped to it.
+function shapePath(ctx, size, shape){
+  ctx.beginPath();
+  if(shape === "circle"){
+    ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
+  } else if(shape === "rounded"){
+    var r = Math.max(1, size * 0.18);
+    ctx.moveTo(r, 0);
+    ctx.arcTo(size, 0, size, size, r);
+    ctx.arcTo(size, size, 0, size, r);
+    ctx.arcTo(0, size, 0, 0, r);
+    ctx.arcTo(0, 0, size, 0, r);
+    ctx.closePath();
+  } else {
+    ctx.rect(0, 0, size, size);
+  }
+}
+
+// Robust text metrics that fall back gracefully when actualBoundingBox* is unavailable.
+function measureText(ctx, text){
+  var m = ctx.measureText(text);
+  var left = m.actualBoundingBoxLeft, right = m.actualBoundingBoxRight;
+  var asc = m.actualBoundingBoxAscent, desc = m.actualBoundingBoxDescent;
+  var w = (isFinite(left) && isFinite(right)) ? (Math.abs(left) + Math.abs(right)) : m.width;
+  if(!(w > 0)) w = m.width;
+  if(!isFinite(asc)) asc = 0;
+  if(!isFinite(desc)) desc = 0;
+  return { w: w, advance: m.width, asc: asc, desc: desc };
+}
+
+function drawText(ctx, size){
+  var text = state.text;
+  var pad = size * state.padding;
+  var maxW = size - pad*2;
+  var maxH = size - pad*2;
+  if(maxW <= 0 || maxH <= 0) return;
+
+  // Measure once at a reference size, then scale to fit the padded box.
+  var ref = 100;
+  ctx.font = state.weight + " " + ref + "px " + state.font;
+  var m0 = measureText(ctx, text);
+  var refH = (m0.asc + m0.desc) || (ref * 0.8);
+  var refW = m0.w || 1;
+  var scale = Math.min(maxW / refW, maxH / refH);
+  var fontSize = Math.max(1, ref * scale);
+
+  ctx.font = state.weight + " " + fontSize + "px " + state.font;
+  var m1 = measureText(ctx, text);
+  ctx.fillStyle = state.textColor;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  // Center the visual box vertically using the real ascent/descent.
+  var y = size/2 + ((m1.asc - m1.desc) / 2);
+  ctx.fillText(text, size/2, y);
+}
+
+function drawImage(ctx, size){
+  var img = state.image;
+  if(!img) return;
+  var pad = size * state.padding;
+  var box = size - pad*2;
+  if(box <= 0) return;
+  var iw = img.naturalWidth || img.width;
+  var ih = img.naturalHeight || img.height;
+  if(!iw || !ih) return;
+  var s = (state.fit === "cover")
+    ? Math.max(box/iw, box/ih)
+    : Math.min(box/iw, box/ih);
+  var dw = iw * s, dh = ih * s;
+  var dx = (size - dw) / 2;
+  var dy = (size - dh) / 2;
+  ctx.drawImage(img, dx, dy, dw, dh);
+}
+
+// Draw the full favicon into ctx at the given pixel size.
+function drawScene(ctx, size){
+  ctx.clearRect(0, 0, size, size);
+  ctx.imageSmoothingEnabled = true;
+  if(ctx.imageSmoothingQuality) ctx.imageSmoothingQuality = "high";
+  ctx.save();
+  shapePath(ctx, size, state.shape);
+  ctx.clip();
+  if(!state.transparent){
+    ctx.fillStyle = state.bgColor;
+    ctx.fillRect(0, 0, size, size);
+  }
+  if(state.mode === "text"){
+    drawText(ctx, size);
+  } else {
+    drawImage(ctx, size);
+  }
+  ctx.restore();
+}
+
+function isReady(){
+  if(state.mode === "text") return state.text.trim().length > 0;
+  return !!state.image;
+}
+
+/* ---------- preview loop ---------- */
+
+function renderPreviews(){
+  var ready = isReady();
+  var large = $("previewLarge");
+  var lctx = large.getContext("2d");
+  lctx.clearRect(0, 0, large.width, large.height);
+  thumbCanvases.forEach(function(c){
+    c.getContext("2d").clearRect(0, 0, c.width, c.height);
+  });
+
+  if(ready){
+    drawScene(lctx, large.width);
+    thumbCanvases.forEach(function(c){
+      drawScene(c.getContext("2d"), c.width);
+    });
+  }
+
+  // enable or disable export buttons
+  Array.prototype.forEach.call(document.querySelectorAll("button.dl"), function(b){
+    b.disabled = !ready;
+  });
+
+  if(!ready){
+    setStatus(state.mode === "text"
+      ? "Enter a letter or emoji to build a favicon."
+      : "Choose an image to build a favicon.", "err");
+  } else if($("status").classList.contains("err")){
+    setStatus("");
+  }
+}
+
+function setStatus(msg, kind){
+  var el = $("status");
+  el.textContent = msg;
+  el.className = kind || "";
+}
+
+/* ---------- export helpers ---------- */
+
+function renderToCanvas(size){
+  var c = document.createElement("canvas");
+  c.width = size; c.height = size;
+  drawScene(c.getContext("2d"), size);
+  return c;
+}
+
+function canvasToPngBytes(canvas){
+  return new Promise(function(resolve, reject){
+    canvas.toBlob(function(blob){
+      if(!blob){ reject(new Error("PNG encoding failed")); return; }
+      blob.arrayBuffer().then(function(buf){
+        resolve(new Uint8Array(buf));
+      }, reject);
+    }, "image/png");
+  });
+}
+
+function triggerDownload(blob, filename){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+}
+
+function downloadPng(size, name){
+  if(!isReady()) return;
+  renderToCanvas(size).toBlob(function(blob){
+    if(!blob){ setStatus("Could not encode the PNG.", "err"); return; }
+    triggerDownload(blob, name || ("favicon-" + size + "x" + size + ".png"));
+    setStatus("Saved " + (name || ("favicon-" + size + "x" + size + ".png")) + ".", "ok");
+  }, "image/png");
+}
+
+// Assemble a real .ico file that embeds PNG data for each size.
+// ICO layout: 6-byte ICONDIR header, one 16-byte ICONDIRENTRY per image, then the PNG blobs.
+function buildIco(images){
+  var count = images.length;
+  var headerSize = 6 + 16 * count;
+  var dataSize = images.reduce(function(sum, im){ return sum + im.bytes.length; }, 0);
+  var buffer = new ArrayBuffer(headerSize + dataSize);
+  var view = new DataView(buffer);
+  var bytes = new Uint8Array(buffer);
+
+  view.setUint16(0, 0, true);       // reserved, must be 0
+  view.setUint16(2, 1, true);       // image type, 1 = icon
+  view.setUint16(4, count, true);   // number of images
+
+  var offset = headerSize;
+  images.forEach(function(im, i){
+    var p = 6 + i * 16;
+    var dim = im.size >= 256 ? 0 : im.size;   // 0 means 256 in the ICO spec
+    view.setUint8(p + 0, dim);                // width
+    view.setUint8(p + 1, dim);                // height
+    view.setUint8(p + 2, 0);                  // palette color count (0 = no palette)
+    view.setUint8(p + 3, 0);                  // reserved
+    view.setUint16(p + 4, 1, true);           // color planes
+    view.setUint16(p + 6, 32, true);          // bits per pixel
+    view.setUint32(p + 8, im.bytes.length, true); // size of PNG data
+    view.setUint32(p + 12, offset, true);     // offset to PNG data
+    bytes.set(im.bytes, offset);
+    offset += im.bytes.length;
+  });
+
+  return new Blob([buffer], { type: "image/x-icon" });
+}
+
+function downloadIco(){
+  if(!isReady()) return;
+  var sizes = [16, 32, 48];
+  setStatus("Building favicon.ico...", "ok");
+  Promise.all(sizes.map(function(sz){
+    return canvasToPngBytes(renderToCanvas(sz)).then(function(bytes){
+      return { size: sz, bytes: bytes };
+    });
+  })).then(function(images){
+    triggerDownload(buildIco(images), "favicon.ico");
+    setStatus("Saved favicon.ico (16, 32, and 48 px).", "ok");
+  }).catch(function(err){
+    setStatus("Could not build the .ico file: " + err.message, "err");
+  });
+}
+
+/* ---------- image loading ---------- */
+
+function loadImageFile(file){
+  if(!file){ return; }
+  if(!/^image\//.test(file.type)){
+    setStatus("That file is not an image.", "err");
+    return;
+  }
+  var url = URL.createObjectURL(file);
+  var img = new Image();
+  img.onload = function(){
+    if(!img.naturalWidth || !img.naturalHeight){
+      setStatus("That image could not be read.", "err");
+      URL.revokeObjectURL(url);
+      return;
+    }
+    state.image = img;
+    URL.revokeObjectURL(url);
+    setStatus("Image loaded.", "ok");
+    renderPreviews();
+  };
+  img.onerror = function(){
+    setStatus("That image could not be loaded. Try a different file.", "err");
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+/* ---------- copy snippet ---------- */
+
+function copySnippet(){
+  var done = function(){ setStatus("Copied the HTML snippet to your clipboard.", "ok"); };
+  var fail = function(){ setStatus("Could not access the clipboard. Select the text and copy it manually.", "err"); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(SNIPPET).then(done, function(){ fallbackCopy(done, fail); });
+  } else {
+    fallbackCopy(done, fail);
+  }
+}
+
+function fallbackCopy(done, fail){
+  try{
+    var ta = document.createElement("textarea");
+    ta.value = SNIPPET;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    ok ? done() : fail();
+  } catch(e){ fail(); }
+}
+
+/* ---------- wiring ---------- */
+
+function setMode(mode){
+  state.mode = mode;
+  $("modeText").setAttribute("aria-pressed", String(mode === "text"));
+  $("modeImage").setAttribute("aria-pressed", String(mode === "image"));
+  $("textControls").classList.toggle("hidden", mode !== "text");
+  $("imageControls").classList.toggle("hidden", mode !== "image");
+  renderPreviews();
+}
+
+function updatePadLabel(){
+  $("padVal").textContent = "(" + Math.round(state.padding * 100) + "%)";
+}
+
+function init(){
+  $("snippet").textContent = SNIPPET;
+  updatePadLabel();
+
+  $("modeText").addEventListener("click", function(){ setMode("text"); });
+  $("modeImage").addEventListener("click", function(){ setMode("image"); });
+
+  $("text").addEventListener("input", function(e){ state.text = e.target.value; renderPreviews(); });
+  $("font").addEventListener("change", function(e){ state.font = e.target.value; renderPreviews(); });
+  $("weight").addEventListener("change", function(e){ state.weight = e.target.value; renderPreviews(); });
+  $("textColor").addEventListener("input", function(e){ state.textColor = e.target.value; renderPreviews(); });
+
+  $("file").addEventListener("change", function(e){ loadImageFile(e.target.files && e.target.files[0]); });
+  $("fit").addEventListener("change", function(e){ state.fit = e.target.value; renderPreviews(); });
+
+  $("bgColor").addEventListener("input", function(e){ state.bgColor = e.target.value; renderPreviews(); });
+  $("shape").addEventListener("change", function(e){ state.shape = e.target.value; renderPreviews(); });
+  $("transparent").addEventListener("change", function(e){ state.transparent = e.target.checked; renderPreviews(); });
+  $("padding").addEventListener("input", function(e){
+    state.padding = Number(e.target.value) / 100;
+    updatePadLabel();
+    renderPreviews();
+  });
+
+  document.querySelectorAll("button.dl[data-png]").forEach(function(b){
+    b.addEventListener("click", function(){
+      downloadPng(Number(b.getAttribute("data-png")), b.getAttribute("data-name"));
+    });
+  });
+  var icoBtn = document.querySelector("button.dl[data-ico]");
+  if(icoBtn) icoBtn.addEventListener("click", downloadIco);
+
+  $("copyBtn").addEventListener("click", copySnippet);
+
+  renderPreviews();
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
